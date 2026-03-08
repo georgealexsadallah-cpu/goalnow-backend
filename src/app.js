@@ -6,6 +6,7 @@ const leaguesRoutes = require("./routes/leagues.routes");
 const standingsRoutes = require("./routes/standings.routes");
 const tipsRoutes = require("./routes/tips.routes");
 const searchRoutes = require("./routes/search.routes");
+const aiRoutes = require("./routes/ai.routes");
 const { getCacheStats } = require("./utils/cache");
 
 const app = express();
@@ -36,5 +37,6 @@ app.use("/leagues", leaguesRoutes);
 app.use("/standings", standingsRoutes);
 app.use("/tips", tipsRoutes);
 app.use("/search", searchRoutes);
+app.use("/ai", aiRoutes);
 
 module.exports = app;
