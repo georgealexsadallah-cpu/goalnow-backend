@@ -8,6 +8,19 @@ const mapTipsResponse = (date, picks) => {
   };
 };
 
+const mapGeneratedTipsResponse = (date, count, picks) => {
+  return {
+    date,
+    requestedCount: count,
+    generatedCount: picks.length,
+    title: "GoalNow Pick Builder",
+    description:
+      "Custom smart picks generated from standings, form, and match strength.",
+    picks,
+  };
+};
+
 module.exports = {
   mapTipsResponse,
+  mapGeneratedTipsResponse,
 };

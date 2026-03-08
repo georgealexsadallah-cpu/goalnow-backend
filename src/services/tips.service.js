@@ -1,8 +1,14 @@
 const apiFootball = require("../config/apiFootball");
 const { CACHE_TTL } = require("../config/cache");
 const { getCacheItem, setCacheItem } = require("../utils/cache");
-const { mapTipsResponse } = require("../mappers/tips.mapper");
-const { buildSmart15Picks } = require("./tips-engine.service");
+const {
+  mapTipsResponse,
+  mapGeneratedTipsResponse,
+} = require("../mappers/tips.mapper");
+const {
+  buildSmart15Picks,
+  buildCustomPicks,
+} = require("./tips-engine.service");
 
 const getTodayDate = () => {
   const now = new Date();
@@ -63,6 +69,14 @@ const buildStandingsByLeagueMap = async (fixtures) => {
   return standingsByLeague;
 };
 
+const fetchFixturesForDate = async (date) => {
+  const response = await apiFootball.get("/fixtures", {
+    params: { date },
+  });
+
+  return response.data?.response || [];
+};
+
 const getTodaysPicks = async () => {
   const date = getTodayDate();
   const cacheKey = `tips:smart15:${date}`;
@@ -72,11 +86,7 @@ const getTodaysPicks = async () => {
     return cachedData;
   }
 
-  const fixturesResponse = await apiFootball.get("/fixtures", {
-    params: { date },
-  });
-
-  const fixtures = fixturesResponse.data?.response || [];
+  const fixtures = await fetchFixturesForDate(date);
   const standingsByLeague = await buildStandingsByLeagueMap(fixtures);
   const smartPicks = buildSmart15Picks(fixtures, standingsByLeague);
   const mappedData = mapTipsResponse(date, smartPicks);
@@ -86,6 +96,25 @@ const getTodaysPicks = async () => {
   return mappedData;
 };
 
+const generatePicksByDate = async (date, count) => {
+  const cacheKey = `tips:generate:${date}:${count}`;
+  const cachedData = getCacheItem(cacheKey);
+
+  if (cachedData) {
+    return cachedData;
+  }
+
+  const fixtures = await fetchFixturesForDate(date);
+  const standingsByLeague = await buildStandingsByLeagueMap(fixtures);
+  const generatedPicks = buildCustomPicks(fixtures, standingsByLeague, count);
+  const mappedData = mapGeneratedTipsResponse(date, count, generatedPicks);
+
+  setCacheItem(cacheKey, mappedData, CACHE_TTL.TIPS);
+
+  return mappedData;
+};
+
 module.exports = {
   getTodaysPicks,
+  generatePicksByDate,
 };

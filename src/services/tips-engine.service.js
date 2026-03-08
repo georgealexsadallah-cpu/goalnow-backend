@@ -251,7 +251,7 @@ const buildSmartPick = (fixtureItem, standingsMap) => {
   };
 };
 
-const buildSmart15Picks = (fixtures, standingsByLeague) => {
+const buildSmartPicks = (fixtures, standingsByLeague) => {
   const playableFixtures = (fixtures || []).filter(isFixturePlayableForTips);
   const picks = [];
 
@@ -275,9 +275,18 @@ const buildSmart15Picks = (fixtures, standingsByLeague) => {
     return (a.timestamp || 0) - (b.timestamp || 0);
   });
 
-  return picks.slice(0, 15);
+  return picks;
+};
+
+const buildSmart15Picks = (fixtures, standingsByLeague) => {
+  return buildSmartPicks(fixtures, standingsByLeague).slice(0, 15);
+};
+
+const buildCustomPicks = (fixtures, standingsByLeague, count) => {
+  return buildSmartPicks(fixtures, standingsByLeague).slice(0, count);
 };
 
 module.exports = {
   buildSmart15Picks,
+  buildCustomPicks,
 };
