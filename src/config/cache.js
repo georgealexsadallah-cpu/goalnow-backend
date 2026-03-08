@@ -5,6 +5,7 @@ const CACHE_TTL = {
   LEAGUES: 6 * 60 * 60 * 1000,
   STANDINGS: 15 * 60 * 1000,
   TIPS: 5 * 60 * 1000,
+  SEARCH: 10 * 60 * 1000,
 };
 
 module.exports = {
