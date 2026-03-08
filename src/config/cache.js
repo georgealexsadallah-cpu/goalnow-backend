@@ -1,0 +1,12 @@
+const CACHE_TTL = {
+  MATCHES_TODAY: 60 * 1000,
+  MATCHES_OTHER_DAYS: 10 * 60 * 1000,
+  MATCH_DETAILS: 2 * 60 * 1000,
+  LEAGUES: 6 * 60 * 60 * 1000,
+  STANDINGS: 15 * 60 * 1000,
+  TIPS: 5 * 60 * 1000,
+};
+
+module.exports = {
+  CACHE_TTL,
+};
