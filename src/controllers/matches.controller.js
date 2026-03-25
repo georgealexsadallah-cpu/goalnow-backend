@@ -5,13 +5,33 @@ const isValidDateFormat = (dateString) => {
   return regex.test(dateString);
 };
 
+const parseIdList = (value) => {
+  if (!value) return [];
+
+  if (Array.isArray(value)) {
+    return value
+      .flatMap((item) => String(item).split(","))
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return String(value)
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const areAllIdsValid = (values) => {
+  return values.every((value) => /^\d+$/.test(String(value)));
+};
+
 const isValidId = (value) => {
   return /^\d+$/.test(String(value));
 };
 
 const getMatches = async (req, res) => {
   try {
-    const { date } = req.query;
+    const { date, favoriteFixtureIds, followedLeagueIds } = req.query;
 
     if (!date) {
       return res.status(400).json({
@@ -27,7 +47,27 @@ const getMatches = async (req, res) => {
       });
     }
 
-    const matches = await matchesService.getMatchesByDate(date);
+    const parsedFavoriteFixtureIds = parseIdList(favoriteFixtureIds);
+    const parsedFollowedLeagueIds = parseIdList(followedLeagueIds);
+
+    if (!areAllIdsValid(parsedFavoriteFixtureIds)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid favoriteFixtureIds. All values must be numeric ids.",
+      });
+    }
+
+    if (!areAllIdsValid(parsedFollowedLeagueIds)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid followedLeagueIds. All values must be numeric ids.",
+      });
+    }
+
+    const matches = await matchesService.getMatchesByDate(date, {
+      favoriteFixtureIds: parsedFavoriteFixtureIds.map(Number),
+      followedLeagueIds: parsedFollowedLeagueIds.map(Number),
+    });
 
     return res.status(200).json({
       success: true,
